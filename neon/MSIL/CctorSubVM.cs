@@ -170,7 +170,6 @@ namespace Neo.Compiler.MSIL
                                 {
                                     if (attr.AttributeType.FullName == "Neo.SmartContract.Framework.NonemitWithConvertAttribute")
                                     {
-                                        var text = (string)calcStack.Pop();
                                         var value = (int)attr.ConstructorArguments[0].Value;
                                         var type = attr.ConstructorArguments[0].Type.Resolve();
                                         string attrname = "";
@@ -184,18 +183,23 @@ namespace Neo.Compiler.MSIL
                                         }
                                         if (attrname == "ToScriptHash")//AddressString2ScriptHashBytes to bytes
                                         {
+                                            var text = (string)calcStack.Pop();
                                             var bytes = NEO.AllianceOfThinWallet.Cryptography.Base58.Decode(text);
                                             var hash = bytes.Skip(1).Take(20).ToArray();
                                             calcStack.Push(hash);
                                         }
                                         else if (attrname == "HexToBytes")//HexString2Bytes to bytes[]
                                         {
+                                            var reverse = Convert.ToBoolean(calcStack.Pop());
+                                            var text = (string)calcStack.Pop();
                                             if (text.IndexOf("0x") == 0) text = text.Substring(2);
                                             var hex = HexString2Bytes(text);
+                                            if (reverse) hex.Reverse();
                                             calcStack.Push(hex);
                                         }
-                                        else if(attrname=="ToBigInteger")
+                                        else if (attrname == "ToBigInteger")
                                         {
+                                            var text = (string)calcStack.Pop();
                                             var n = System.Numerics.BigInteger.Parse(text);
                                             calcStack.Push(n);
                                         }
